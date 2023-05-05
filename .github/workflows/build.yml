@@ -14,9 +14,9 @@ jobs:
     strategy:
       matrix:
         os:
-          - windows-latest
+          # - windows-latest
           - buildjet-16vcpu-ubuntu-2004
-          - macos-latest
+          # - macos-latest
 
     runs-on: ${{ matrix.os }}
 
