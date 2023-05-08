@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 
 use clap::{Parser, Subcommand};
+use solana_program::pubkey::Pubkey;
 
 use crate::processor::MintType;
 
@@ -24,6 +25,14 @@ pub enum Commands {
     Propose {
         /// Proposal name
         #[arg(short, long)]
+        source_buffer: Pubkey,
+
+        /// Proposal description
+        #[arg(short, long)]
+        spill_account: Option<Pubkey>,
+
+        /// Proposal name
+        #[arg(short, long)]
         name: String,
 
         /// Proposal description
@@ -33,5 +42,8 @@ pub enum Commands {
         /// Mint type: Member or Council
         #[arg(short, long)]
         mint_type: MintType,
+
+        #[arg(short, long)]
+        options: Vec<String>,
     },
 }

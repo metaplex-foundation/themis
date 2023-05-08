@@ -17,17 +17,22 @@ fn main() -> Result<()> {
 
     match args.command {
         Commands::Propose {
+            source_buffer,
+            spill_account,
             name,
             description,
             mint_type,
+            options,
         } => propose(ProposeArgs {
             keypair_path,
             rpc_url,
+            source_buffer,
+            spill_account,
             name,
             description,
             mint_type,
             vote_type: VoteType::SingleChoice,
-            options: vec!["single_vote".to_string()],
+            options,
         }),
     }
 }

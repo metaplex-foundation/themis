@@ -6,12 +6,15 @@ use solana_client::rpc_client::RpcClient;
 use solana_program::pubkey::Pubkey;
 use solana_sdk::signer::Signer;
 use spl_governance::{
-    instruction::{create_proposal, sign_off_proposal},
+    instruction::{add_signatory, create_proposal, insert_transaction, sign_off_proposal},
     state::{proposal::get_proposal_address, token_owner_record::get_token_owner_record_address},
     state::{proposal::VoteType, realm::RealmV2},
 };
 
-use crate::{config, GOVERNANCE_ID, GOVERNANCE_PROGRAM_ID, REALM_ID};
+use crate::{
+    config, instruction::create_upgrade_program_instruction, GOVERNANCE_ID, GOVERNANCE_PROGRAM_ID,
+    REALM_ID,
+};
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum MintType {
@@ -34,6 +37,8 @@ impl FromStr for MintType {
 pub struct ProposeArgs {
     pub keypair_path: Option<PathBuf>,
     pub rpc_url: Option<String>,
+    pub source_buffer: Pubkey,
+    pub spill_account: Option<Pubkey>,
     pub name: String,
     pub description: String,
     pub mint_type: MintType,
@@ -54,7 +59,11 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
             .ok_or_else(|| anyhow!("Council mint not found"))?,
     };
 
+    println!("Options: {:?}", args.options);
+
     let proposal_index: u32 = realm.voting_proposal_count.into();
+
+    println!("Proposal index: {}", proposal_index);
 
     let proposal_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
@@ -87,7 +96,47 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
         &proposal_index.to_le_bytes(),
     );
 
+    let token_owner_record = get_token_owner_record_address(
+        &GOVERNANCE_PROGRAM_ID,
+        &REALM_ID,
+        &governing_token_mint,
+        &config.keypair.pubkey(),
+    );
+
     println!("proposal address: {}", proposal_address);
+
+    let add_signatory_ix = add_signatory(
+        &GOVERNANCE_PROGRAM_ID,
+        &proposal_address,
+        &token_owner_record,
+        &config.keypair.pubkey(),
+        &config.keypair.pubkey(),
+        &config.keypair.pubkey(),
+    );
+
+    // Empirically determined from existing proposals. Not sure the significance of these yet.
+    let option_index = 0;
+    let index = 0;
+    let hold_up_time = 0;
+
+    let program_upgrade_instruction = create_upgrade_program_instruction(
+        args.source_buffer,
+        args.spill_account.unwrap_or(config.keypair.pubkey()),
+        config.keypair.pubkey(),
+    );
+
+    let insert_ix = insert_transaction(
+        &GOVERNANCE_PROGRAM_ID,
+        &GOVERNANCE_ID,
+        &proposal_address,
+        &token_owner_record,
+        &config.keypair.pubkey(),
+        &config.keypair.pubkey(),
+        option_index,
+        index,
+        hold_up_time,
+        vec![program_upgrade_instruction],
+    );
 
     let sign_off_ix = sign_off_proposal(
         &GOVERNANCE_PROGRAM_ID,
@@ -95,11 +144,11 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
         &GOVERNANCE_ID,
         &proposal_address,
         &config.keypair.pubkey(),
-        Some(&proposal_owner_record),
+        None,
     );
 
     let tx = solana_sdk::transaction::Transaction::new_signed_with_payer(
-        &[create_ix, sign_off_ix],
+        &[create_ix, add_signatory_ix, insert_ix, sign_off_ix],
         Some(&config.keypair.pubkey()),
         &[&config.keypair],
         config.client.get_latest_blockhash()?,
