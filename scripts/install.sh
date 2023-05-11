@@ -70,18 +70,6 @@ fi
 
 DIST="$VERSION"
 
-printf "Do you want the latest release(y/n): "
-read answer
-if [ "$answer" != "${answer#[Yy]}" ] ;then 
-        echo ""; 
-else
-        printf "You can find all the releases here $RELEASE_URL"
-        echo ""
-        printf "Enter relase version (e.g, v0.8.7, v0.8.6): "
-        read release
-        RELEASE="$release"
-fi
-
 # creates a temporary directory to save the distribution file
 SOURCE="$(mktemp -d)"
 

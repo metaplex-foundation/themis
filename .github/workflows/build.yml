@@ -99,7 +99,7 @@ jobs:
 
       - name: Publish Artifacts
         uses: actions/upload-artifact@v3
-        if: "!startsWith(github.ref, 'refs/tags/')"
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
         with:
           name: ${{ matrix.os }}
           path: ${{ steps.build.outputs.binary_path }}
