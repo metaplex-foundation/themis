@@ -7,7 +7,10 @@ use solana_program::pubkey::Pubkey;
 use solana_sdk::signer::Signer;
 use spl_governance::{
     instruction::{add_signatory, create_proposal, insert_transaction, sign_off_proposal},
-    state::{proposal::get_proposal_address, token_owner_record::get_token_owner_record_address},
+    state::{
+        governance::GovernanceV2, proposal::get_proposal_address,
+        token_owner_record::get_token_owner_record_address,
+    },
     state::{proposal::VoteType, realm::RealmV2},
 };
 
@@ -50,6 +53,7 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
     let config = config::CliConfig::new(args.keypair_path, args.rpc_url)?;
 
     let realm = get_realm_data(&config.client, &REALM_ID)?;
+    let governance = get_governance_data(&config.client, &GOVERNANCE_ID)?;
 
     let governing_token_mint = match args.mint_type {
         MintType::Member => realm.community_mint,
@@ -61,7 +65,7 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
 
     println!("Options: {:?}", args.options);
 
-    let proposal_index: u32 = realm.voting_proposal_count.into();
+    let proposal_index: u32 = governance.proposals_count;
 
     println!("Proposal index: {}", proposal_index);
 
@@ -163,4 +167,10 @@ fn get_realm_data(client: &RpcClient, realm: &Pubkey) -> Result<RealmV2> {
     let account = client.get_account(realm)?;
     let realm_data = RealmV2::deserialize(&mut account.data.as_slice())?;
     Ok(realm_data)
+}
+
+fn get_governance_data(client: &RpcClient, governance: &Pubkey) -> Result<GovernanceV2> {
+    let account = client.get_account(governance)?;
+    let governance_data = GovernanceV2::deserialize(&mut account.data.as_slice())?;
+    Ok(governance_data)
 }
