@@ -49,8 +49,11 @@ pub struct ProposeArgs {
 pub fn propose(args: ProposeArgs) -> Result<()> {
     let config = config::CliConfig::new(args.keypair_path, args.rpc_url)?;
 
-    let realm_id = Pubkey::from_str(&env::var("REALM_ID")?)?;
-    let governance_id = Pubkey::from_str(&env::var("GOVERNANCE_ID")?)?;
+    let realm_id =
+        Pubkey::from_str(&env::var("REALM_ID").map_err(|_| anyhow!("Missing REALM_ID env var."))?)?;
+    let governance_id = Pubkey::from_str(
+        &env::var("GOVERNANCE_ID").map_err(|_| anyhow!("Missing GOVERNANCE_ID env var."))?,
+    )?;
 
     let realm = get_realm_data(&config.client, &realm_id)?;
     let governance = get_governance_data(&config.client, &governance_id)?;

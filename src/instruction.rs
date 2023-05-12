@@ -1,7 +1,7 @@
 use std::env;
 use std::str::FromStr;
 
-use anyhow::Result;
+use anyhow::{anyhow, Result};
 use solana_program::pubkey::Pubkey;
 use solana_program::sysvar::{clock::ID as sysvar_clock, rent::ID as rent_sysvar};
 use spl_governance::state::proposal_transaction::{AccountMetaData, InstructionData};
@@ -13,8 +13,12 @@ pub fn create_upgrade_program_instruction(
     spill_account: Pubkey,
     upgrade_authority: Pubkey,
 ) -> Result<InstructionData> {
-    let program_data = Pubkey::from_str(&env::var("PROGRAM_DATA")?)?;
-    let program_id = Pubkey::from_str(&env::var("PROGRAM_ID")?)?;
+    let program_data = Pubkey::from_str(
+        &env::var("PROGRAM_DATA").map_err(|_| anyhow!("Missing PROGRAM_DATA env var."))?,
+    )?;
+    let program_id = Pubkey::from_str(
+        &env::var("PROGRAM_ID").map_err(|_| anyhow!("Missing PROGRAM_ID env var."))?,
+    )?;
 
     Ok(InstructionData {
         program_id: BPF_UPLOADER_ID,
