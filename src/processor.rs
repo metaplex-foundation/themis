@@ -133,7 +133,7 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
     let program_upgrade_instruction = create_upgrade_program_instruction(
         args.source_buffer,
         args.spill_account.unwrap_or(config.keypair.pubkey()),
-        config.keypair.pubkey(),
+        governance_id,
     )?;
 
     let insert_ix = insert_transaction(
