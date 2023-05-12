@@ -10,6 +10,8 @@ use themis::{
 fn main() -> Result<()> {
     solana_logger::setup_with_default("solana=error");
 
+    dotenv::dotenv().ok();
+
     let args = args::Args::parse();
 
     let keypair_path = args.keypair_path.clone();

@@ -1,24 +1,35 @@
+use std::env;
+use std::str::FromStr;
+
+use anyhow::{anyhow, Result};
 use solana_program::pubkey::Pubkey;
 use solana_program::sysvar::{clock::ID as sysvar_clock, rent::ID as rent_sysvar};
 use spl_governance::state::proposal_transaction::{AccountMetaData, InstructionData};
 
-use crate::{BPF_UPLOADER_ID, PROGRAM_DATA, PROGRAM_ID};
+use crate::BPF_UPLOADER_ID;
 
 pub fn create_upgrade_program_instruction(
     source_buffer: Pubkey,
     spill_account: Pubkey,
     upgrade_authority: Pubkey,
-) -> InstructionData {
-    InstructionData {
+) -> Result<InstructionData> {
+    let program_data = Pubkey::from_str(
+        &env::var("PROGRAM_DATA").map_err(|_| anyhow!("Missing PROGRAM_DATA env var."))?,
+    )?;
+    let program_id = Pubkey::from_str(
+        &env::var("PROGRAM_ID").map_err(|_| anyhow!("Missing PROGRAM_ID env var."))?,
+    )?;
+
+    Ok(InstructionData {
         program_id: BPF_UPLOADER_ID,
         accounts: vec![
             AccountMetaData {
-                pubkey: PROGRAM_DATA,
+                pubkey: program_data,
                 is_signer: false,
                 is_writable: true,
             },
             AccountMetaData {
-                pubkey: PROGRAM_ID,
+                pubkey: program_id,
                 is_signer: false,
                 is_writable: true,
             },
@@ -49,5 +60,5 @@ pub fn create_upgrade_program_instruction(
             },
         ],
         data: vec![3, 0, 0, 0],
-    }
+    })
 }
