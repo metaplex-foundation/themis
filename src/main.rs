@@ -40,12 +40,14 @@ fn main() -> Result<()> {
             proposal_id,
             vote_choice,
             mint_type,
+            latest,
         } => vote(VoteArgs {
             keypair_path,
             rpc_url,
             proposal_id,
             vote_choice,
             mint_type,
+            latest,
         }),
     }
 }

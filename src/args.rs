@@ -47,13 +47,18 @@ pub enum Commands {
         options: Vec<String>,
     },
     Vote {
-        /// Proposal pubkey
-        proposal_id: Pubkey,
-
         /// Vote: true = yes, false = no
         vote_choice: Vote,
 
+        /// Proposal pubkey
+        #[arg(short, long)]
+        proposal_id: Option<Pubkey>,
+
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
+
+        /// Vote on the most recent proposal
+        #[arg(short, long)]
+        latest: bool,
     },
 }

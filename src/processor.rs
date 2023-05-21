@@ -177,9 +177,10 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
 pub struct VoteArgs {
     pub keypair_path: Option<PathBuf>,
     pub rpc_url: Option<String>,
-    pub proposal_id: Pubkey,
+    pub proposal_id: Option<Pubkey>,
     pub vote_choice: Vote,
     pub mint_type: MintType,
+    pub latest: bool,
 }
 
 pub fn vote(args: VoteArgs) -> Result<()> {
@@ -207,13 +208,35 @@ pub fn vote(args: VoteArgs) -> Result<()> {
             .ok_or_else(|| anyhow!("Council mint not found"))?,
     };
 
+    let proposal_id = if args.latest {
+        let governance: GovernanceV2 = get_governance_state(&config.client, &governance_id)?;
+        let proposal_index = governance.proposals_count - 1;
+
+        println!("Proposal index: {}", proposal_index);
+
+        get_proposal_address(
+            &GOVERNANCE_PROGRAM_ID,
+            &governance_id,
+            &governing_token_mint,
+            &proposal_index.to_le_bytes(),
+        )
+    } else if let Some(proposal_id) = args.proposal_id {
+        proposal_id
+    } else {
+        return Err(anyhow!("Either --latest or --proposal-id must be provided"));
+    };
+
+    println!("Proposal ID: {}", proposal_id);
+
     // We need to find the owner of the proposal to find the correct proposal_owner_record
     // as this will only be the voter if the voter also created the proposal.
 
-    let proposal: ProposalV2 = get_governance_state(&config.client, &args.proposal_id)?;
+    let proposal: ProposalV2 = get_governance_state(&config.client, &proposal_id)?;
 
     let token_owner_record: TokenOwnerRecordV2 =
         get_governance_state(&config.client, &proposal.token_owner_record)?;
+
+    println!("Token owner record: {:?}", token_owner_record);
 
     let proposal_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
@@ -239,7 +262,7 @@ pub fn vote(args: VoteArgs) -> Result<()> {
         &GOVERNANCE_PROGRAM_ID,
         &realm_id,
         &governance_id,
-        &args.proposal_id,
+        &proposal_id,
         &proposal_owner_record,
         &voter_token_owner_record,
         &config.keypair.pubkey(),
