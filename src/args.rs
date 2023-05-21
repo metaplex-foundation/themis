@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use solana_program::pubkey::Pubkey;
 
-use crate::processor::MintType;
+use crate::{processor::MintType, Vote};
 
 #[derive(Parser)]
 #[clap(author, version, about)]
@@ -40,10 +40,20 @@ pub enum Commands {
         description: String,
 
         /// Mint type: Member or Council
-        #[arg(short, long)]
+        #[arg(short, long, default_value = "council")]
         mint_type: MintType,
 
         #[arg(short, long)]
         options: Vec<String>,
+    },
+    Vote {
+        /// Proposal pubkey
+        proposal_id: Pubkey,
+
+        /// Vote: true = yes, false = no
+        vote_choice: Vote,
+
+        #[arg(short, long, default_value = "council")]
+        mint_type: MintType,
     },
 }

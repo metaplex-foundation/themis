@@ -1,6 +1,7 @@
 use solana_program::pubkey;
 use solana_sdk::pubkey::Pubkey;
-use std::fmt;
+use spl_governance::state::vote_record::{Vote as SplVote, VoteChoice};
+use std::{fmt, str::FromStr};
 
 pub mod args;
 pub mod config;
@@ -17,6 +18,45 @@ impl fmt::Display for Cluster {
         match self {
             Cluster::Devnet => write!(f, "devnet"),
             Cluster::Mainnet => write!(f, "mainnet-beta"),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+pub enum Vote {
+    Yes,
+    No,
+}
+
+impl fmt::Display for Vote {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Vote::Yes => write!(f, "yes"),
+            Vote::No => write!(f, "no"),
+        }
+    }
+}
+
+impl FromStr for Vote {
+    type Err = anyhow::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.to_lowercase().as_str() {
+            "yes" | "yay" | "yeah" | "true" | "yea" => Ok(Vote::Yes),
+            "no" | "nay" | "nah" => Ok(Vote::No),
+            _ => Err(anyhow::anyhow!("Invalid vote")),
+        }
+    }
+}
+
+impl From<Vote> for SplVote {
+    fn from(vote: Vote) -> Self {
+        match vote {
+            Vote::Yes => SplVote::Approve(vec![VoteChoice {
+                rank: 0,
+                weight_percentage: 100,
+            }]),
+            Vote::No => SplVote::Deny,
         }
     }
 }
