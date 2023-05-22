@@ -238,8 +238,6 @@ pub fn vote(args: VoteArgs) -> Result<()> {
     let token_owner_record: TokenOwnerRecordV2 =
         get_governance_state(&config.client, &proposal.token_owner_record)?;
 
-    println!("Token owner record: {:?}", token_owner_record);
-
     let proposal_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
         &realm_id,
