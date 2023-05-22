@@ -54,11 +54,23 @@ pub enum Commands {
         #[arg(short, long)]
         proposal_id: Option<Pubkey>,
 
+        /// Vote on the most recent proposal
+        #[arg(short, long)]
+        latest: bool,
+
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
+    },
+    Execute {
+        /// Proposal pubkey
+        #[arg(short, long)]
+        proposal_id: Option<Pubkey>,
 
         /// Vote on the most recent proposal
         #[arg(short, long)]
         latest: bool,
+
+        #[arg(short, long, default_value = "council")]
+        mint_type: MintType,
     },
 }
