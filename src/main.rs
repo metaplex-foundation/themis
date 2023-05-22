@@ -4,7 +4,10 @@ use clap::Parser;
 use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
-    processor::{execute, propose, vote, ExecuteArgs, ProposeArgs, VoteArgs},
+    processor::{
+        deposit, execute, propose, vote, withdraw, DepositArgs, ExecuteArgs, ProposeArgs, VoteArgs,
+        WithdrawArgs,
+    },
 };
 
 fn main() -> Result<()> {
@@ -59,6 +62,17 @@ fn main() -> Result<()> {
             proposal_id,
             mint_type,
             latest,
+        }),
+        Commands::Deposit { amount, mint_type } => deposit(DepositArgs {
+            keypair_path,
+            rpc_url,
+            amount,
+            mint_type,
+        }),
+        Commands::Withdraw { mint_type } => withdraw(WithdrawArgs {
+            keypair_path,
+            rpc_url,
+            mint_type,
         }),
     }
 }

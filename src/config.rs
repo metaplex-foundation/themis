@@ -2,13 +2,14 @@ use anyhow::{anyhow, Result};
 use dirs::home_dir;
 use serde::{Deserialize, Serialize};
 use solana_client::rpc_client::RpcClient;
+use solana_program::pubkey::Pubkey;
 use solana_sdk::{
     clock::Slot,
     commitment_config::CommitmentConfig,
     hash::Hash,
     signature::{read_keypair_file, Keypair},
 };
-use std::{fs::File, path::PathBuf, str::FromStr};
+use std::{env, fs::File, path::PathBuf, str::FromStr};
 
 #[derive(Debug, Deserialize, Serialize)]
 struct SolanaConfig {
@@ -22,6 +23,8 @@ pub struct CliConfig {
     pub keypair: Keypair,
     pub recent_blockhash: Hash,
     pub recent_slot: Slot,
+    pub realm_id: Pubkey,
+    pub governance_id: Pubkey,
 }
 
 #[derive(Debug, Default)]
@@ -75,11 +78,21 @@ impl CliConfigBuilder {
         let recent_blockhash = client.get_latest_blockhash()?;
         let recent_slot = client.get_slot()?;
 
+        let realm_id_var =
+            env::var("REALM_ID").map_err(|_| anyhow!("Missing REALM_ID env var."))?;
+        let governance_id_var =
+            env::var("GOVERNANCE_ID").map_err(|_| anyhow!("Missing GOVERNANCE_ID env var."))?;
+
+        let realm_id = Pubkey::from_str(&realm_id_var)?;
+        let governance_id = Pubkey::from_str(&governance_id_var)?;
+
         Ok(CliConfig {
             client,
             keypair,
             recent_blockhash,
             recent_slot,
+            realm_id,
+            governance_id,
         })
     }
 }
@@ -107,14 +120,6 @@ impl CliConfig {
         let config = builder.build()?;
 
         Ok(config)
-    }
-
-    #[allow(unused)]
-    pub fn update_blocks(&mut self) -> Result<()> {
-        self.recent_blockhash = self.client.get_latest_blockhash()?;
-        self.recent_slot = self.client.get_slot()?;
-
-        Ok(())
     }
 }
 

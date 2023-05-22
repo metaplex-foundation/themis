@@ -73,4 +73,15 @@ pub enum Commands {
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
     },
+    Deposit {
+        /// Amount of governance tokens to deposit
+        amount: u64,
+
+        #[arg(short, long, default_value = "council")]
+        mint_type: MintType,
+    },
+    Withdraw {
+        #[arg(short, long, default_value = "council")]
+        mint_type: MintType,
+    },
 }
