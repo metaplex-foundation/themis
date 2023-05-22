@@ -4,7 +4,7 @@ use clap::Parser;
 use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
-    processor::{propose, vote, ProposeArgs, VoteArgs},
+    processor::{execute, propose, vote, ExecuteArgs, ProposeArgs, VoteArgs},
 };
 
 fn main() -> Result<()> {
@@ -46,6 +46,17 @@ fn main() -> Result<()> {
             rpc_url,
             proposal_id,
             vote_choice,
+            mint_type,
+            latest,
+        }),
+        Commands::Execute {
+            proposal_id,
+            mint_type,
+            latest,
+        } => execute(ExecuteArgs {
+            keypair_path,
+            rpc_url,
+            proposal_id,
             mint_type,
             latest,
         }),
