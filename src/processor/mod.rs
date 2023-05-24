@@ -1,4 +1,4 @@
-use std::{env, path::PathBuf, str::FromStr};
+use std::{path::PathBuf, str::FromStr};
 
 use anyhow::{anyhow, Result};
 use borsh::BorshDeserialize;

@@ -26,8 +26,6 @@ pub fn vote(args: VoteArgs) -> Result<()> {
         let governance: GovernanceV2 = get_governance_state(&config.client, &config.governance_id)?;
         let proposal_index = governance.proposals_count - 1;
 
-        println!("Proposal index: {}", proposal_index);
-
         get_proposal_address(
             &GOVERNANCE_PROGRAM_ID,
             &config.governance_id,
@@ -39,8 +37,6 @@ pub fn vote(args: VoteArgs) -> Result<()> {
     } else {
         return Err(anyhow!("Either --latest or --proposal-id must be provided"));
     };
-
-    println!("Proposal ID: {}", proposal_id);
 
     // We need to find the owner of the proposal to find the correct proposal_owner_record
     // as this will only be the voter if the voter also created the proposal.
@@ -56,8 +52,6 @@ pub fn vote(args: VoteArgs) -> Result<()> {
         &governing_token_mint,
         &token_owner_record.governing_token_owner,
     );
-
-    println!("Proposal owner record: {}", proposal_owner_record);
 
     let voter_token_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
