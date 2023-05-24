@@ -15,18 +15,8 @@ pub struct ProposeArgs {
 pub fn propose(args: ProposeArgs) -> Result<()> {
     let config = config::CliConfig::new(args.keypair_path, args.rpc_url)?;
 
-    let realm_id_var = env::var("REALM_ID").map_err(|_| anyhow!("Missing REALM_ID env var."))?;
-    let governance_id_var =
-        env::var("GOVERNANCE_ID").map_err(|_| anyhow!("Missing GOVERNANCE_ID env var."))?;
-
-    println!("Realm ID: {}", realm_id_var);
-    println!("Governance ID: {}", governance_id_var);
-
-    let realm_id = Pubkey::from_str(&realm_id_var)?;
-    let governance_id = Pubkey::from_str(&governance_id_var)?;
-
-    let realm = get_realm_data(&config.client, &realm_id)?;
-    let governance = get_governance_data(&config.client, &governance_id)?;
+    let realm = get_realm_data(&config.client, &config.realm_id)?;
+    let governance = get_governance_data(&config.client, &config.governance_id)?;
 
     let governing_token_mint = match args.mint_type {
         MintType::Member => realm.community_mint,
@@ -36,27 +26,23 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
             .ok_or_else(|| anyhow!("Council mint not found"))?,
     };
 
-    println!("Options: {:?}", args.options);
-
     let proposal_index: u32 = governance.proposals_count;
-
-    println!("Proposal index: {}", proposal_index);
 
     let proposal_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
-        &realm_id,
+        &config.realm_id,
         &governing_token_mint,
         &config.keypair.pubkey(),
     );
 
     let create_ix = create_proposal(
         &GOVERNANCE_PROGRAM_ID,
-        &governance_id,
+        &config.governance_id,
         &proposal_owner_record,
         &config.keypair.pubkey(),
         &config.keypair.pubkey(),
         None,
-        &realm_id,
+        &config.realm_id,
         args.name,
         args.description,
         &governing_token_mint,
@@ -68,19 +54,17 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
 
     let proposal_address = get_proposal_address(
         &GOVERNANCE_PROGRAM_ID,
-        &governance_id,
+        &config.governance_id,
         &governing_token_mint,
         &proposal_index.to_le_bytes(),
     );
 
     let token_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
-        &realm_id,
+        &config.realm_id,
         &governing_token_mint,
         &config.keypair.pubkey(),
     );
-
-    println!("proposal address: {}", proposal_address);
 
     let add_signatory_ix = add_signatory(
         &GOVERNANCE_PROGRAM_ID,
@@ -99,12 +83,12 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
     let program_upgrade_instruction = create_upgrade_program_instruction(
         args.source_buffer,
         args.spill_account.unwrap_or(config.keypair.pubkey()),
-        governance_id,
+        config.governance_id,
     )?;
 
     let insert_ix = insert_transaction(
         &GOVERNANCE_PROGRAM_ID,
-        &governance_id,
+        &config.governance_id,
         &proposal_address,
         &token_owner_record,
         &config.keypair.pubkey(),
@@ -117,8 +101,8 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
 
     let sign_off_ix = sign_off_proposal(
         &GOVERNANCE_PROGRAM_ID,
-        &realm_id,
-        &governance_id,
+        &config.realm_id,
+        &config.governance_id,
         &proposal_address,
         &config.keypair.pubkey(),
         None,

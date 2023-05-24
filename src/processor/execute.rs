@@ -11,19 +11,7 @@ pub struct ExecuteArgs {
 pub fn execute(args: ExecuteArgs) -> Result<()> {
     let config = config::CliConfig::new(args.keypair_path, args.rpc_url)?;
 
-    println!("Authority: {}", config.keypair.pubkey());
-
-    let realm_id_var = env::var("REALM_ID").map_err(|_| anyhow!("Missing REALM_ID env var."))?;
-    let governance_id_var =
-        env::var("GOVERNANCE_ID").map_err(|_| anyhow!("Missing GOVERNANCE_ID env var."))?;
-
-    println!("Realm ID: {}", realm_id_var);
-    println!("Governance ID: {}", governance_id_var);
-
-    let realm_id = Pubkey::from_str(&realm_id_var)?;
-    let governance_id = Pubkey::from_str(&governance_id_var)?;
-
-    let realm: RealmV2 = get_governance_state(&config.client, &realm_id)?;
+    let realm: RealmV2 = get_governance_state(&config.client, &config.realm_id)?;
 
     let governing_token_mint = match args.mint_type {
         MintType::Member => realm.community_mint,
@@ -34,14 +22,12 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
     };
 
     let proposal_id = if args.latest {
-        let governance: GovernanceV2 = get_governance_state(&config.client, &governance_id)?;
+        let governance: GovernanceV2 = get_governance_state(&config.client, &config.governance_id)?;
         let proposal_index = governance.proposals_count - 1;
-
-        println!("Proposal index: {}", proposal_index);
 
         get_proposal_address(
             &GOVERNANCE_PROGRAM_ID,
-            &governance_id,
+            &config.governance_id,
             &governing_token_mint,
             &proposal_index.to_le_bytes(),
         )
@@ -51,20 +37,10 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
         return Err(anyhow!("Either --latest or --proposal-id must be provided"));
     };
 
-    println!("Proposal ID: {}", proposal_id);
-
     // We need to find the owner of the proposal to find the correct proposal_owner_record
     // as this will only be the voter if the voter also created the proposal.
 
     let proposal: ProposalV2 = get_governance_state(&config.client, &proposal_id)?;
-
-    let token_owner_record: TokenOwnerRecordV2 =
-        get_governance_state(&config.client, &proposal.token_owner_record)?;
-
-    println!(
-        "governing token owner: {:?}",
-        token_owner_record.governing_token_owner
-    );
 
     // All our upgrade proposals should have option and instruction indexes of 0,
     // but to support more generically we should get the indexes.
@@ -76,16 +52,12 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
         .transactions_next_index
         - 1) as u8;
 
-    println!("Option index: {:?}", option_index);
-
     let proposal_transaction_pubkey = get_proposal_transaction_address(
         &GOVERNANCE_PROGRAM_ID,
         &proposal_id,
         &option_index.to_le_bytes(),
         &[0, 0],
     );
-
-    println!("Proposal transaction: {}", proposal_transaction_pubkey);
 
     let proposal_transaction: ProposalTransactionV2 =
         get_governance_state(&config.client, &proposal_transaction_pubkey)?;
@@ -111,7 +83,7 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
         .into_iter()
         .map(|a| AccountMeta {
             pubkey: a.pubkey,
-            is_signer: if a.pubkey == governance_id {
+            is_signer: if a.pubkey == config.governance_id {
                 false
             } else {
                 a.is_signer
@@ -120,11 +92,9 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
         })
         .collect();
 
-    println!("Instruction program ID: {}", instruction_program_id);
-
     let ix = execute_transaction(
         &GOVERNANCE_PROGRAM_ID,
-        &governance_id,
+        &config.governance_id,
         &proposal_id,
         &proposal_transaction_pubkey,
         &instruction_program_id,
