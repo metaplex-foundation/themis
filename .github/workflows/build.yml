@@ -40,19 +40,19 @@ jobs:
         run: |
           rustup component add rustfmt clippy
           cargo install cargo-cache
-      - name: Cache Dependencies
-        if: runner.os == 'Linux' || runner.os == 'macOS'
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            target/
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
+      # - name: Cache Dependencies
+      #   if: runner.os == 'Linux' || runner.os == 'macOS'
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.cargo/bin/
+      #       ~/.cargo/registry/index/
+      #       ~/.cargo/registry/cache/
+      #       ~/.cargo/git/db/
+      #       target/
+      #     key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-cargo-
       - name: Build
         id: build
         shell: bash
