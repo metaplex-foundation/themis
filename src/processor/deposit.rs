@@ -20,6 +20,8 @@ pub fn deposit(args: DepositArgs) -> Result<()> {
             .ok_or_else(|| anyhow!("Council mint not found"))?,
     };
 
+    debug!("Governing Token Mint: {governing_token_mint}");
+
     let governing_token_source =
         get_associated_token_address(&config.keypair.pubkey(), &governing_token_mint);
     let authority = config.keypair.pubkey();
@@ -45,7 +47,9 @@ pub fn deposit(args: DepositArgs) -> Result<()> {
         config.client.get_latest_blockhash()?,
     );
 
-    config.client.send_and_confirm_transaction(&tx)?;
+    config
+        .client
+        .send_and_confirm_transaction_with_spinner(&tx)?;
 
     Ok(())
 }

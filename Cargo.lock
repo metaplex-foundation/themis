@@ -1107,6 +1107,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "env_logger"
+version = "0.10.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "85cdab6a89accf66733ad5a1693a4dcced6aeff64602b634530dd73c1f3ee9f0"
+dependencies = [
+ "humantime",
+ "is-terminal",
+ "log",
+ "regex",
+ "termcolor",
+]
+
+[[package]]
 name = "errno"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3082,7 +3095,7 @@ version = "1.14.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "12090fa9b638f374492c86c62b79e0e82479e3632ced02a33ff560ffdce72e04"
 dependencies = [
- "env_logger",
+ "env_logger 0.9.3",
  "lazy_static",
  "log",
 ]
@@ -3687,6 +3700,8 @@ dependencies = [
  "clap 4.2.7",
  "dirs",
  "dotenv",
+ "env_logger 0.10.0",
+ "log",
  "serde",
  "serde_yaml 0.9.21",
  "solana-client",

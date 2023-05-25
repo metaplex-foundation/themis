@@ -21,6 +21,8 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
             .ok_or_else(|| anyhow!("Council mint not found"))?,
     };
 
+    debug!("Governing token mint: {governing_token_mint}");
+
     let proposal_id = if args.latest {
         let governance: GovernanceV2 = get_governance_state(&config.client, &config.governance_id)?;
         let proposal_index = governance.proposals_count - 1;
@@ -37,6 +39,8 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
         return Err(anyhow!("Either --latest or --proposal-id must be provided"));
     };
 
+    debug!("Proposal ID: {proposal_id}");
+
     // We need to find the owner of the proposal to find the correct proposal_owner_record
     // as this will only be the voter if the voter also created the proposal.
 
@@ -52,12 +56,16 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
         .transactions_next_index
         - 1) as u8;
 
+    debug!("Option index: {option_index}");
+
     let proposal_transaction_pubkey = get_proposal_transaction_address(
         &GOVERNANCE_PROGRAM_ID,
         &proposal_id,
         &option_index.to_le_bytes(),
         &[0, 0],
     );
+
+    debug!("Proposal transaction pubkey: {proposal_transaction_pubkey}");
 
     let proposal_transaction: ProposalTransactionV2 =
         get_governance_state(&config.client, &proposal_transaction_pubkey)?;
@@ -108,7 +116,9 @@ pub fn execute(args: ExecuteArgs) -> Result<()> {
         config.client.get_latest_blockhash()?,
     );
 
-    config.client.send_and_confirm_transaction(&tx)?;
+    config
+        .client
+        .send_and_confirm_transaction_with_spinner(&tx)?;
 
     Ok(())
 }

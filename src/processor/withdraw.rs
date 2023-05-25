@@ -19,8 +19,13 @@ pub fn withdraw(args: WithdrawArgs) -> Result<()> {
             .ok_or_else(|| anyhow!("Council mint not found"))?,
     };
 
+    debug!("Governing Token Mint: {governing_token_mint}");
+
     let governing_token_destination =
         get_associated_token_address(&config.keypair.pubkey(), &governing_token_mint);
+
+    debug!("Governing Token Destination: {governing_token_destination}");
+
     let authority = config.keypair.pubkey();
     let governing_token_owner = &authority;
 
@@ -39,7 +44,9 @@ pub fn withdraw(args: WithdrawArgs) -> Result<()> {
         config.client.get_latest_blockhash()?,
     );
 
-    config.client.send_and_confirm_transaction(&tx)?;
+    config
+        .client
+        .send_and_confirm_transaction_with_spinner(&tx)?;
 
     Ok(())
 }
