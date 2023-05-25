@@ -2,6 +2,7 @@ use std::{path::PathBuf, str::FromStr};
 
 use anyhow::{anyhow, Result};
 use borsh::BorshDeserialize;
+use log::debug;
 use solana_client::rpc_client::RpcClient;
 use solana_program::{instruction::AccountMeta, pubkey::Pubkey};
 use solana_sdk::signer::Signer;
