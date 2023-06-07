@@ -82,7 +82,8 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
 
     let program_upgrade_instruction = create_upgrade_program_instruction(
         args.source_buffer,
-        args.spill_account.unwrap_or(config.keypair.pubkey()),
+        args.spill_account
+            .unwrap_or_else(|| config.keypair.pubkey()),
         config.governance_id,
     )?;
 

@@ -9,7 +9,7 @@ use spl_associated_token_account::get_associated_token_address;
 use spl_governance::{
     instruction::{
         add_signatory, cast_vote, create_proposal, deposit_governing_tokens, execute_transaction,
-        insert_transaction, sign_off_proposal, withdraw_governing_tokens,
+        insert_transaction, set_governance_config, sign_off_proposal, withdraw_governing_tokens,
     },
     state::{
         governance::GovernanceV2,
@@ -26,12 +26,14 @@ use crate::{config, instruction::create_upgrade_program_instruction, Vote, GOVER
 mod deposit;
 mod execute;
 mod propose;
+mod update;
 mod vote;
 mod withdraw;
 
 pub use deposit::*;
 pub use execute::*;
 pub use propose::*;
+pub use update::*;
 pub use vote::*;
 pub use withdraw::*;
 

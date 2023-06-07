@@ -84,4 +84,23 @@ pub enum Commands {
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
     },
+    Update {
+        #[arg(long)]
+        vote_threshold_percentage: Option<u8>,
+
+        #[arg(long)]
+        min_council_weight_to_create_proposal: Option<u64>,
+
+        #[arg(long)]
+        min_transaction_hold_up_time: Option<u32>,
+
+        #[arg(long)]
+        max_voting_time: Option<u32>,
+
+        #[arg(long)]
+        proposal_cool_off_time: Option<u32>,
+
+        #[arg(long)]
+        min_comunity_weight_to_create_proposal: Option<u64>,
+    },
 }

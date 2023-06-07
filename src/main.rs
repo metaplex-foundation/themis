@@ -5,8 +5,8 @@ use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
     processor::{
-        deposit, execute, propose, vote, withdraw, DepositArgs, ExecuteArgs, ProposeArgs, VoteArgs,
-        WithdrawArgs,
+        deposit, execute, propose, update, vote, withdraw, DepositArgs, ExecuteArgs, ProposeArgs,
+        UpdateArgs, VoteArgs, WithdrawArgs,
     },
 };
 
@@ -73,6 +73,23 @@ fn main() -> Result<()> {
             keypair_path,
             rpc_url,
             mint_type,
+        }),
+        Commands::Update {
+            vote_threshold_percentage,
+            min_council_weight_to_create_proposal,
+            min_transaction_hold_up_time,
+            max_voting_time,
+            proposal_cool_off_time,
+            min_comunity_weight_to_create_proposal,
+        } => update(UpdateArgs {
+            keypair_path,
+            rpc_url,
+            vote_threshold_percentage,
+            min_council_weight_to_create_proposal,
+            min_transaction_hold_up_time,
+            max_voting_time,
+            proposal_cool_off_time,
+            min_comunity_weight_to_create_proposal,
         }),
     }
 }
