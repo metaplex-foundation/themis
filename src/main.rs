@@ -1,6 +1,7 @@
 use anyhow::Result;
 use clap::Parser;
 
+use log::debug;
 use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
@@ -12,6 +13,8 @@ use themis::{
 
 fn main() -> Result<()> {
     solana_logger::setup_with_default("solana=error");
+
+    debug!("Themis CLI");
 
     dotenv::dotenv().ok();
 

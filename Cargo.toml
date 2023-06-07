@@ -12,6 +12,8 @@ borsh = "0.9.3"
 clap = { version = "4.2.7", features = ["derive"] }
 dirs = "5.0.1"
 dotenv = "0.15.0"
+env_logger = "0.10.0"
+log = "0.4.17"
 serde = "1.0.160"
 serde_yaml = "0.9.21"
 solana-client = "~1.14"

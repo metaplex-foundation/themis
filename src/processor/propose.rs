@@ -26,7 +26,11 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
             .ok_or_else(|| anyhow!("Council mint not found"))?,
     };
 
+    debug!("Governing Token Mint: {governing_token_mint}");
+
     let proposal_index: u32 = governance.proposals_count;
+
+    debug!("Proposal index: {proposal_index}");
 
     let proposal_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
@@ -34,6 +38,8 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
         &governing_token_mint,
         &config.keypair.pubkey(),
     );
+
+    debug!("Proposal Owner Record: {proposal_owner_record}");
 
     let create_ix = create_proposal(
         &GOVERNANCE_PROGRAM_ID,
@@ -59,12 +65,16 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
         &proposal_index.to_le_bytes(),
     );
 
+    debug!("Proposal Address: {proposal_address}");
+
     let token_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
         &config.realm_id,
         &governing_token_mint,
         &config.keypair.pubkey(),
     );
+
+    debug!("Token Owner Record: {token_owner_record}");
 
     let add_signatory_ix = add_signatory(
         &GOVERNANCE_PROGRAM_ID,
@@ -116,7 +126,9 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
         config.client.get_latest_blockhash()?,
     );
 
-    config.client.send_and_confirm_transaction(&tx)?;
+    config
+        .client
+        .send_and_confirm_transaction_with_spinner(&tx)?;
 
     Ok(())
 }
