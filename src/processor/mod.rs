@@ -10,7 +10,7 @@ use spl_associated_token_account::get_associated_token_address;
 use spl_governance::{
     instruction::{
         add_signatory, cast_vote, create_proposal, deposit_governing_tokens, execute_transaction,
-        insert_transaction, set_governance_config, sign_off_proposal, withdraw_governing_tokens,
+        insert_transaction, sign_off_proposal, withdraw_governing_tokens,
     },
     state::{
         governance::GovernanceV2,

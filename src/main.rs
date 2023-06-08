@@ -78,6 +78,7 @@ fn main() -> Result<()> {
             mint_type,
         }),
         Commands::Update {
+            mint_type,
             vote_threshold_percentage,
             min_council_weight_to_create_proposal,
             min_transaction_hold_up_time,
@@ -87,6 +88,7 @@ fn main() -> Result<()> {
         } => update(UpdateArgs {
             keypair_path,
             rpc_url,
+            mint_type,
             vote_threshold_percentage,
             min_council_weight_to_create_proposal,
             min_transaction_hold_up_time,

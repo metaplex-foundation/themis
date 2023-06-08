@@ -9,6 +9,7 @@ publish = false
 [dependencies]
 anyhow = "1.0.71"
 borsh = "0.9.3"
+chrono = "0.4.26"
 clap = { version = "4.2.7", features = ["derive"] }
 dirs = "5.0.1"
 dotenv = "0.15.0"

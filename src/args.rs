@@ -85,6 +85,10 @@ pub enum Commands {
         mint_type: MintType,
     },
     Update {
+        /// Mint type: Member or Council
+        #[arg(short, long, default_value = "council")]
+        mint_type: MintType,
+
         #[arg(long)]
         vote_threshold_percentage: Option<u8>,
 
@@ -94,6 +98,7 @@ pub enum Commands {
         #[arg(long)]
         min_transaction_hold_up_time: Option<u32>,
 
+        /// Max voting time in seconds
         #[arg(long)]
         max_voting_time: Option<u32>,
 
