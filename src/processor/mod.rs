@@ -26,15 +26,15 @@ use crate::{config, instruction::create_upgrade_program_instruction, Vote, GOVER
 
 mod deposit;
 mod execute;
-mod propose;
-mod update;
+mod upgrade_program;
+mod update_config;
 mod vote;
 mod withdraw;
 
 pub use deposit::*;
 pub use execute::*;
-pub use propose::*;
-pub use update::*;
+pub use upgrade_program::*;
+pub use update_config::*;
 pub use vote::*;
 pub use withdraw::*;
 

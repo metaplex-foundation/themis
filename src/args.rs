@@ -22,7 +22,7 @@ pub struct Args {
 
 #[derive(Clone, Subcommand)]
 pub enum Commands {
-    Propose {
+    UpgradeProgram {
         /// Proposal name
         #[arg(short, long)]
         source_buffer: Pubkey,
@@ -84,7 +84,7 @@ pub enum Commands {
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
     },
-    Update {
+    UpdateConfig {
         /// Mint type: Member or Council
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,

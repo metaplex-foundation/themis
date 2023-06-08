@@ -5,7 +5,7 @@ use crate::instruction::create_set_governance_config_instruction;
 
 use super::*;
 
-pub struct UpdateArgs {
+pub struct UpdateConfigArgs {
     pub keypair_path: Option<PathBuf>,
     pub rpc_url: Option<String>,
     pub mint_type: MintType,
@@ -17,7 +17,7 @@ pub struct UpdateArgs {
     pub min_comunity_weight_to_create_proposal: Option<u64>,
 }
 
-pub fn update(args: UpdateArgs) -> Result<()> {
+pub fn update_config(args: UpdateConfigArgs) -> Result<()> {
     let config = config::CliConfig::new(args.keypair_path, args.rpc_url)?;
 
     let realm = get_realm_data(&config.client, &config.realm_id)?;
