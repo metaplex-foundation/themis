@@ -6,8 +6,8 @@ use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
     processor::{
-        deposit, execute, propose, vote, withdraw, DepositArgs, ExecuteArgs, ProposeArgs, VoteArgs,
-        WithdrawArgs,
+        deposit, execute, update_config, upgrade_program, vote, withdraw, DepositArgs, ExecuteArgs,
+        UpdateConfigArgs, UpgradeProgramArgs, VoteArgs, WithdrawArgs,
     },
 };
 
@@ -24,14 +24,14 @@ fn main() -> Result<()> {
     let rpc_url = args.rpc_url.clone();
 
     match args.command {
-        Commands::Propose {
+        Commands::UpgradeProgram {
             source_buffer,
             spill_account,
             name,
             description,
             mint_type,
             options,
-        } => propose(ProposeArgs {
+        } => upgrade_program(UpgradeProgramArgs {
             keypair_path,
             rpc_url,
             source_buffer,
@@ -76,6 +76,25 @@ fn main() -> Result<()> {
             keypair_path,
             rpc_url,
             mint_type,
+        }),
+        Commands::UpdateConfig {
+            mint_type,
+            vote_threshold_percentage,
+            min_council_weight_to_create_proposal,
+            min_transaction_hold_up_time,
+            max_voting_time,
+            proposal_cool_off_time,
+            min_comunity_weight_to_create_proposal,
+        } => update_config(UpdateConfigArgs {
+            keypair_path,
+            rpc_url,
+            mint_type,
+            vote_threshold_percentage,
+            min_council_weight_to_create_proposal,
+            min_transaction_hold_up_time,
+            max_voting_time,
+            proposal_cool_off_time,
+            min_comunity_weight_to_create_proposal,
         }),
     }
 }

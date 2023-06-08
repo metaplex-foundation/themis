@@ -1,6 +1,6 @@
 use super::*;
 
-pub struct ProposeArgs {
+pub struct UpgradeProgramArgs {
     pub keypair_path: Option<PathBuf>,
     pub rpc_url: Option<String>,
     pub source_buffer: Pubkey,
@@ -12,7 +12,7 @@ pub struct ProposeArgs {
     pub options: Vec<String>,
 }
 
-pub fn propose(args: ProposeArgs) -> Result<()> {
+pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
     let config = config::CliConfig::new(args.keypair_path, args.rpc_url)?;
 
     let realm = get_realm_data(&config.client, &config.realm_id)?;
@@ -92,7 +92,8 @@ pub fn propose(args: ProposeArgs) -> Result<()> {
 
     let program_upgrade_instruction = create_upgrade_program_instruction(
         args.source_buffer,
-        args.spill_account.unwrap_or(config.keypair.pubkey()),
+        args.spill_account
+            .unwrap_or_else(|| config.keypair.pubkey()),
         config.governance_id,
     )?;
 

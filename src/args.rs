@@ -22,7 +22,7 @@ pub struct Args {
 
 #[derive(Clone, Subcommand)]
 pub enum Commands {
-    Propose {
+    UpgradeProgram {
         /// Proposal name
         #[arg(short, long)]
         source_buffer: Pubkey,
@@ -83,5 +83,29 @@ pub enum Commands {
     Withdraw {
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
+    },
+    UpdateConfig {
+        /// Mint type: Member or Council
+        #[arg(short, long, default_value = "council")]
+        mint_type: MintType,
+
+        #[arg(long)]
+        vote_threshold_percentage: Option<u8>,
+
+        #[arg(long)]
+        min_council_weight_to_create_proposal: Option<u64>,
+
+        #[arg(long)]
+        min_transaction_hold_up_time: Option<u32>,
+
+        /// Max voting time in seconds
+        #[arg(long)]
+        max_voting_time: Option<u32>,
+
+        #[arg(long)]
+        proposal_cool_off_time: Option<u32>,
+
+        #[arg(long)]
+        min_comunity_weight_to_create_proposal: Option<u64>,
     },
 }
