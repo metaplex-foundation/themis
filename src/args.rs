@@ -108,4 +108,5 @@ pub enum Commands {
         #[arg(long)]
         min_comunity_weight_to_create_proposal: Option<u64>,
     },
+    GetGovConfig,
 }
