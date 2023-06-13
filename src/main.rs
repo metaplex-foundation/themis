@@ -6,8 +6,9 @@ use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
     processor::{
-        deposit, execute, update_config, upgrade_program, vote, withdraw, DepositArgs, ExecuteArgs,
-        UpdateConfigArgs, UpgradeProgramArgs, VoteArgs, WithdrawArgs,
+        deposit, execute, get_gov_config, update_config, upgrade_program, vote, withdraw,
+        DepositArgs, ExecuteArgs, GetGovConfigArgs, UpdateConfigArgs, UpgradeProgramArgs, VoteArgs,
+        WithdrawArgs,
     },
 };
 
@@ -95,6 +96,10 @@ fn main() -> Result<()> {
             max_voting_time,
             proposal_cool_off_time,
             min_comunity_weight_to_create_proposal,
+        }),
+        Commands::GetGovConfig {} => get_gov_config(GetGovConfigArgs {
+            keypair_path,
+            rpc_url,
         }),
     }
 }

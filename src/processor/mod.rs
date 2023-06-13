@@ -26,6 +26,7 @@ use crate::{config, instruction::create_upgrade_program_instruction, Vote, GOVER
 
 mod deposit;
 mod execute;
+mod get_gov_config;
 mod update_config;
 mod upgrade_program;
 mod vote;
@@ -33,6 +34,7 @@ mod withdraw;
 
 pub use deposit::*;
 pub use execute::*;
+pub use get_gov_config::*;
 pub use update_config::*;
 pub use upgrade_program::*;
 pub use vote::*;
