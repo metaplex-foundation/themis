@@ -9,8 +9,8 @@ use solana_sdk::signer::Signer;
 use spl_associated_token_account::get_associated_token_address;
 use spl_governance::{
     instruction::{
-        add_signatory, cast_vote, create_proposal, deposit_governing_tokens, execute_transaction,
-        insert_transaction, sign_off_proposal, withdraw_governing_tokens,
+        add_signatory, cancel_proposal, cast_vote, create_proposal, deposit_governing_tokens,
+        execute_transaction, insert_transaction, sign_off_proposal, withdraw_governing_tokens,
     },
     state::{
         governance::GovernanceV2,
@@ -24,6 +24,7 @@ use spl_governance::{
 
 use crate::{config, instruction::create_upgrade_program_instruction, Vote, GOVERNANCE_PROGRAM_ID};
 
+mod cancel;
 mod deposit;
 mod execute;
 mod get_gov_config;
@@ -32,6 +33,7 @@ mod upgrade_program;
 mod vote;
 mod withdraw;
 
+pub use cancel::*;
 pub use deposit::*;
 pub use execute::*;
 pub use get_gov_config::*;
