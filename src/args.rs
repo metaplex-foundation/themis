@@ -24,11 +24,11 @@ pub struct Args {
 pub enum Commands {
     UpgradeProgram {
         /// Proposal name
-        #[arg(short, long)]
+        #[arg(short = 'b', long)]
         source_buffer: Pubkey,
 
         /// Account to return buffer funds to, defaults to authority keypair
-        #[arg(short = 'S', long)]
+        #[arg(short, long)]
         spill_account: Option<Pubkey>,
 
         /// Proposal name
