@@ -27,15 +27,15 @@ pub enum Commands {
         #[arg(short, long)]
         source_buffer: Pubkey,
 
-        /// Proposal description
-        #[arg(short, long)]
+        /// Account to return buffer funds to, defaults to authority keypair
+        #[arg(short = 'S', long)]
         spill_account: Option<Pubkey>,
 
         /// Proposal name
         #[arg(short, long)]
         name: String,
 
-        /// Proposal description
+        /// Proposal description or link to proposal description
         #[arg(short, long)]
         description: String,
 
