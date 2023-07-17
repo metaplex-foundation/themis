@@ -22,6 +22,7 @@ pub struct Args {
 
 #[derive(Clone, Subcommand)]
 pub enum Commands {
+    /// Create a proposal for upgrading a program
     UpgradeProgram {
         /// Proposal name
         #[arg(short = 'b', long)]
@@ -46,6 +47,7 @@ pub enum Commands {
         #[arg(short, long)]
         options: Vec<String>,
     },
+    /// Vote on a proposal
     Vote {
         /// Vote: true = yes, false = no
         vote_choice: Vote,
@@ -61,6 +63,7 @@ pub enum Commands {
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
     },
+    /// Execute a proposal
     Execute {
         /// Proposal pubkey
         #[arg(short, long)]
@@ -73,6 +76,20 @@ pub enum Commands {
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
     },
+    /// Cancel a proposal
+    Cancel {
+        /// Proposal pubkey
+        #[arg(short, long)]
+        proposal_id: Option<Pubkey>,
+
+        /// Vote on the most recent proposal
+        #[arg(short, long)]
+        latest: bool,
+
+        #[arg(short, long, default_value = "council")]
+        mint_type: MintType,
+    },
+    /// Deposit governance tokens
     Deposit {
         /// Amount of governance tokens to deposit
         amount: u64,
@@ -80,10 +97,12 @@ pub enum Commands {
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
     },
+    /// Withdraw governance tokens
     Withdraw {
         #[arg(short, long, default_value = "council")]
         mint_type: MintType,
     },
+    /// Update a governance configuration
     UpdateConfig {
         /// Mint type: Member or Council
         #[arg(short, long, default_value = "council")]
@@ -108,5 +127,6 @@ pub enum Commands {
         #[arg(long)]
         min_comunity_weight_to_create_proposal: Option<u64>,
     },
+    /// Get a governance configuration
     GetGovConfig,
 }

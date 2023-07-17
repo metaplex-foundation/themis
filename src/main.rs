@@ -6,9 +6,9 @@ use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
     processor::{
-        deposit, execute, get_gov_config, update_config, upgrade_program, vote, withdraw,
-        DepositArgs, ExecuteArgs, GetGovConfigArgs, UpdateConfigArgs, UpgradeProgramArgs, VoteArgs,
-        WithdrawArgs,
+        cancel, deposit, execute, get_gov_config, update_config, upgrade_program, vote, withdraw,
+        CancelArgs, DepositArgs, ExecuteArgs, GetGovConfigArgs, UpdateConfigArgs,
+        UpgradeProgramArgs, VoteArgs, WithdrawArgs,
     },
 };
 
@@ -61,6 +61,17 @@ fn main() -> Result<()> {
             mint_type,
             latest,
         } => execute(ExecuteArgs {
+            keypair_path,
+            rpc_url,
+            proposal_id,
+            mint_type,
+            latest,
+        }),
+        Commands::Cancel {
+            proposal_id,
+            mint_type,
+            latest,
+        } => cancel(CancelArgs {
             keypair_path,
             rpc_url,
             proposal_id,
