@@ -6,9 +6,10 @@ use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
     processor::{
-        cancel, deposit, execute, get_buffers, get_gov_config, update_config, upgrade_program,
-        vote, withdraw, CancelArgs, DepositArgs, ExecuteArgs, GetBuffersArgs, GetGovConfigArgs,
-        UpdateConfigArgs, UpgradeProgramArgs, VoteArgs, WithdrawArgs,
+        cancel, close_buffers, deposit, execute, get_buffers, get_gov_config, update_config,
+        upgrade_program, vote, withdraw, CancelArgs, CloseBuffersArgs, DepositArgs, ExecuteArgs,
+        GetBuffersArgs, GetGovConfigArgs, UpdateConfigArgs, UpgradeProgramArgs, VoteArgs,
+        WithdrawArgs,
     },
 };
 
@@ -123,5 +124,25 @@ fn main() -> Result<()> {
 
             Ok(())
         }
+        Commands::CloseBuffers {
+            authority,
+            recipient,
+            spill_account,
+            name,
+            description,
+            mint_type,
+            options,
+        } => close_buffers(CloseBuffersArgs {
+            keypair_path,
+            rpc_url,
+            authority,
+            recipient,
+            spill_account,
+            name,
+            description,
+            mint_type,
+            vote_type: VoteType::SingleChoice,
+            options,
+        }),
     }
 }

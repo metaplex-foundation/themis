@@ -1,9 +1,14 @@
+use solana_program::instruction::Instruction;
+use spl_governance::state::proposal_transaction::{AccountMetaData, InstructionData};
+
 use super::*;
 
-pub struct UpgradeProgramArgs {
+#[derive(Debug, Clone)]
+pub struct CloseBuffersArgs {
     pub keypair_path: Option<PathBuf>,
     pub rpc_url: Option<String>,
-    pub source_buffer: Pubkey,
+    pub authority: Pubkey,
+    pub recipient: Pubkey,
     pub spill_account: Option<Pubkey>,
     pub name: String,
     pub description: String,
@@ -12,9 +17,12 @@ pub struct UpgradeProgramArgs {
     pub options: Vec<String>,
 }
 
+const BATCH_SIZE: usize = 10;
 
-pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
-    let config = config::CliConfig::new(args.keypair_path, args.rpc_url)?;
+pub fn close_buffers(args: CloseBuffersArgs) -> Result<()> {
+    let config = config::CliConfig::new(args.keypair_path.clone(), args.rpc_url.clone())?;
+
+    let buffers = get_buffers(args.clone().into())?;
 
     let realm = get_realm_data(&config.client, &config.realm_id)?;
     let governance = get_governance_data(&config.client, &config.governance_id)?;
@@ -27,11 +35,7 @@ pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
             .ok_or_else(|| anyhow!("Council mint not found"))?,
     };
 
-    debug!("Governing Token Mint: {governing_token_mint}");
-
     let proposal_index: u32 = governance.proposals_count;
-
-    debug!("Proposal index: {proposal_index}");
 
     let proposal_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
@@ -40,7 +44,21 @@ pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
         &config.keypair.pubkey(),
     );
 
-    debug!("Proposal Owner Record: {proposal_owner_record}");
+    let mut instructions = vec![];
+
+    for buffer in buffers.iter().take(BATCH_SIZE) {
+        instructions.push(bpf_loader_upgradeable::close_any(
+            &buffer.address,
+            &args.recipient,
+            Some(&args.authority),
+            None,
+        ));
+    }
+
+    let instructions = instructions
+        .into_iter()
+        .map(into_instruction_data)
+        .collect();
 
     let create_ix = create_proposal(
         &GOVERNANCE_PROGRAM_ID,
@@ -66,16 +84,12 @@ pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
         &proposal_index.to_le_bytes(),
     );
 
-    debug!("Proposal Address: {proposal_address}");
-
     let token_owner_record = get_token_owner_record_address(
         &GOVERNANCE_PROGRAM_ID,
         &config.realm_id,
         &governing_token_mint,
         &config.keypair.pubkey(),
     );
-
-    debug!("Token Owner Record: {token_owner_record}");
 
     let add_signatory_ix = add_signatory(
         &GOVERNANCE_PROGRAM_ID,
@@ -91,13 +105,6 @@ pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
     let index = 0;
     let hold_up_time = 0;
 
-    let program_upgrade_instruction = create_upgrade_program_instruction(
-        args.source_buffer,
-        args.spill_account
-            .unwrap_or_else(|| config.keypair.pubkey()),
-        config.governance_id,
-    )?;
-
     let insert_ix = insert_transaction(
         &GOVERNANCE_PROGRAM_ID,
         &config.governance_id,
@@ -108,7 +115,7 @@ pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
         option_index,
         index,
         hold_up_time,
-        vec![program_upgrade_instruction],
+        instructions,
     );
 
     let sign_off_ix = sign_off_proposal(
@@ -132,4 +139,26 @@ pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
         .send_and_confirm_transaction_with_spinner(&tx)?;
 
     Ok(())
+}
+
+fn into_instruction_data(instruction: Instruction) -> InstructionData {
+    let accounts = instruction
+        .accounts
+        .into_iter()
+        .map(into_account_meta_data)
+        .collect();
+
+    InstructionData {
+        program_id: instruction.program_id,
+        accounts,
+        data: instruction.data,
+    }
+}
+
+fn into_account_meta_data(account: AccountMeta) -> AccountMetaData {
+    AccountMetaData {
+        pubkey: account.pubkey,
+        is_signer: account.is_signer,
+        is_writable: account.is_writable,
+    }
 }

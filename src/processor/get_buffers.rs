@@ -1,16 +1,27 @@
 use super::*;
 
+#[derive(Debug, Clone)]
 pub struct GetBuffersArgs {
     pub keypair_path: Option<PathBuf>,
     pub rpc_url: Option<String>,
     pub authority: Pubkey,
 }
 
+impl From<CloseBuffersArgs> for GetBuffersArgs {
+    fn from(args: CloseBuffersArgs) -> Self {
+        Self {
+            keypair_path: args.keypair_path,
+            rpc_url: args.rpc_url,
+            authority: args.authority,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct UpgradeableBuffer {
-    pub address: String,
-    pub authority: String,
+    pub address: Pubkey,
+    pub authority: Pubkey,
     pub data_len: usize,
     pub lamports: u64,
 }
@@ -52,13 +63,16 @@ pub fn get_buffers(args: GetBuffersArgs) -> Result<Vec<UpgradeableBuffer>> {
     )?;
 
     let mut buffers = vec![];
-    for (address, account) in results.iter() {
+    for (address, account) in results.into_iter() {
         if let Ok(UpgradeableLoaderState::Buffer { authority_address }) = account.state() {
+            // Skip if no authority is set as it cannot be closed.
+            if authority_address.is_none() {
+                continue;
+            }
+
             buffers.push(UpgradeableBuffer {
-                address: address.to_string(),
-                authority: authority_address
-                    .map(|pubkey| pubkey.to_string())
-                    .unwrap_or_else(|| "none".to_string()),
+                address,
+                authority: authority_address.unwrap(),
                 data_len: account.data.len(),
                 lamports: account.lamports,
             });

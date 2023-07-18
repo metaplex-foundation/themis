@@ -35,6 +35,7 @@ use std::mem::size_of;
 use crate::{config, instruction::create_upgrade_program_instruction, Vote, GOVERNANCE_PROGRAM_ID};
 
 mod cancel;
+mod close_buffers;
 mod deposit;
 mod execute;
 mod get_buffers;
@@ -45,6 +46,7 @@ mod vote;
 mod withdraw;
 
 pub use cancel::*;
+pub use close_buffers::*;
 pub use deposit::*;
 pub use execute::*;
 pub use get_buffers::*;
