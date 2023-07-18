@@ -12,8 +12,6 @@ use spl_governance::state::proposal_transaction::{AccountMetaData, InstructionDa
 
 use crate::{BPF_UPLOADER_ID, GOVERNANCE_PROGRAM_ID};
 
-
-
 pub fn create_upgrade_program_instruction(
     source_buffer: Pubkey,
     spill_account: Pubkey,
@@ -99,4 +97,3 @@ pub fn create_set_governance_config_instruction(
 
 //     Ok(InstructionData { program_id: BPF_UPLOADER_ID, accounts: (), data: () })
 // }
-
