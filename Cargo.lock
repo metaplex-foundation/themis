@@ -3711,6 +3711,7 @@ dependencies = [
  "log",
  "serde",
  "serde_yaml 0.9.21",
+ "solana-account-decoder",
  "solana-client",
  "solana-logger",
  "solana-program",

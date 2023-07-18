@@ -129,4 +129,6 @@ pub enum Commands {
     },
     /// Get a governance configuration
     GetGovConfig,
+    /// Get all buffers owned by the governance program
+    GetBuffers { authority: Pubkey },
 }

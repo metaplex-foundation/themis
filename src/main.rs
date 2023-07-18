@@ -6,9 +6,9 @@ use spl_governance::state::proposal::VoteType;
 use themis::{
     args::{self, Commands},
     processor::{
-        cancel, deposit, execute, get_gov_config, update_config, upgrade_program, vote, withdraw,
-        CancelArgs, DepositArgs, ExecuteArgs, GetGovConfigArgs, UpdateConfigArgs,
-        UpgradeProgramArgs, VoteArgs, WithdrawArgs,
+        cancel, deposit, execute, get_buffers, get_gov_config, update_config, upgrade_program,
+        vote, withdraw, CancelArgs, DepositArgs, ExecuteArgs, GetBuffersArgs, GetGovConfigArgs,
+        UpdateConfigArgs, UpgradeProgramArgs, VoteArgs, WithdrawArgs,
     },
 };
 
@@ -112,5 +112,16 @@ fn main() -> Result<()> {
             keypair_path,
             rpc_url,
         }),
+        Commands::GetBuffers { authority } => {
+            let buffers = get_buffers(GetBuffersArgs {
+                keypair_path,
+                rpc_url,
+                authority,
+            })?;
+
+            println!("Buffers: {:#?}", buffers);
+
+            Ok(())
+        }
     }
 }

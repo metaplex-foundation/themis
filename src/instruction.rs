@@ -3,6 +3,7 @@ use std::str::FromStr;
 
 use anyhow::{anyhow, Result};
 use borsh::BorshSerialize;
+
 use solana_program::pubkey::Pubkey;
 use solana_program::sysvar::{clock::ID as sysvar_clock, rent::ID as rent_sysvar};
 use spl_governance::instruction::GovernanceInstruction;
@@ -10,6 +11,8 @@ use spl_governance::state::governance::GovernanceConfig;
 use spl_governance::state::proposal_transaction::{AccountMetaData, InstructionData};
 
 use crate::{BPF_UPLOADER_ID, GOVERNANCE_PROGRAM_ID};
+
+
 
 pub fn create_upgrade_program_instruction(
     source_buffer: Pubkey,
@@ -85,3 +88,15 @@ pub fn create_set_governance_config_instruction(
         data: instruction.try_to_vec()?,
     })
 }
+
+// pub fn create_recover_buffer_instruction(
+//     buffer: &Pubkey,
+//     recipient: &Pubkey,
+//     authority: &Pubkey,
+// ) -> Result<InstructionData> {
+
+//     let instruction: solana_program::instruction::Instruction = bpf_loader_upgradeable::close_any(buffer, recipient, Some(&authority), None);
+
+//     Ok(InstructionData { program_id: BPF_UPLOADER_ID, accounts: (), data: () })
+// }
+
