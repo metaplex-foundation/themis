@@ -12,7 +12,6 @@ pub struct UpgradeProgramArgs {
     pub options: Vec<String>,
 }
 
-
 pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
     let config = config::CliConfig::new(args.keypair_path, args.rpc_url)?;
 
