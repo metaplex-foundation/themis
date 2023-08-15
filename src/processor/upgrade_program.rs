@@ -126,9 +126,17 @@ pub fn upgrade_program(args: UpgradeProgramArgs) -> Result<()> {
         config.client.get_latest_blockhash()?,
     );
 
-    config
-        .client
-        .send_and_confirm_transaction_with_spinner(&tx)?;
-
-    Ok(())
+    match config.client.send_and_confirm_transaction_with_spinner(&tx) {
+        Ok(signature) => {
+            println!("Upgrade program proposal signature: {}", signature);
+            Ok(())
+        }
+        Err(error) => {
+            debug!(
+                "Error creating proposal: {:?}",
+                error.get_transaction_error()
+            );
+            Err(error.into())
+        }
+    }
 }
