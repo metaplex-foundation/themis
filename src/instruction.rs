@@ -86,14 +86,3 @@ pub fn create_set_governance_config_instruction(
         data: instruction.try_to_vec()?,
     })
 }
-
-// pub fn create_recover_buffer_instruction(
-//     buffer: &Pubkey,
-//     recipient: &Pubkey,
-//     authority: &Pubkey,
-// ) -> Result<InstructionData> {
-
-//     let instruction: solana_program::instruction::Instruction = bpf_loader_upgradeable::close_any(buffer, recipient, Some(&authority), None);
-
-//     Ok(InstructionData { program_id: BPF_UPLOADER_ID, accounts: (), data: () })
-// }
