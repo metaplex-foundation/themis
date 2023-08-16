@@ -129,4 +129,30 @@ pub enum Commands {
     },
     /// Get a governance configuration
     GetGovConfig,
+    /// Get all buffers owned by the governance program
+    GetBuffers { authority: Pubkey },
+    CloseBuffers {
+        authority: Pubkey,
+
+        recipient: Pubkey,
+
+        /// Account to return buffer funds to, defaults to authority keypair
+        #[arg(short, long)]
+        spill_account: Option<Pubkey>,
+
+        /// Proposal name
+        #[arg(short, long)]
+        name: String,
+
+        /// Proposal description or link to proposal description
+        #[arg(short, long)]
+        description: String,
+
+        /// Mint type: Member or Council
+        #[arg(short, long, default_value = "council")]
+        mint_type: MintType,
+
+        #[arg(short, long)]
+        options: Vec<String>,
+    },
 }
